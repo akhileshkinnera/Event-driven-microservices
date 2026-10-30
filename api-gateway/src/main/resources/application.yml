@@ -1,0 +1,26 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/api/auth/**
+        - id: profile-service
+          uri: http://profile-service:8082
+          predicates:
+            - Path=/api/profiles/**
+          filters:
+            - JwtAuthentication
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
