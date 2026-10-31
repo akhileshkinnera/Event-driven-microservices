@@ -5,11 +5,10 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState({ firstName: '', lastName: '', email: '' });
   const [message, setMessage] = useState('');
 
-  // 1. Extracted fetch function so the button can call it
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/profiles/me', {
+      const response = await axios.get('https://api-gateway-j9ss.onrender.com/api/profiles/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data) {
@@ -22,7 +21,6 @@ const ProfilePage = () => {
     }
   };
 
-  // 2. Automatically fetch when the page loads (optional)
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -31,7 +29,7 @@ const ProfilePage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.put('http://localhost:8080/api/profiles/me', profile, {
+      await axios.put('https://api-gateway-j9ss.onrender.com/api/profiles/me', profile, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessage('Profile updated successfully! RabbitMQ event triggered.');
@@ -44,7 +42,6 @@ const ProfilePage = () => {
     <div style={{ maxWidth: '500px', margin: '50px auto', textAlign: 'center', fontFamily: 'sans-serif' }}>
       <h2>My Profile</h2>
       
-      {/* 3. New Button to manually fetch/refresh the logged-in user's data */}
       <button 
         type="button" 
         onClick={fetchProfile} 
