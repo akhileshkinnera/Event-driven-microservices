@@ -33,6 +33,10 @@ public class AuthController {
         User user = new User();
         user.setUsername(request.get("username"));
         user.setPasswordHash(passwordEncoder.encode(request.get("password")));
+        
+        // FIX: Assign a default role so it is not null in the database
+        user.setRole("USER"); 
+        
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully");
     }
@@ -43,7 +47,11 @@ public class AuthController {
         
         if (userOpt.isPresent() && passwordEncoder.matches(request.get("password"), userOpt.get().getPasswordHash())) {
             User user = userOpt.get();
-            String token = jwtService.generateToken(user.getUsername(), user.getRole(), user.getId());
+            
+            // FIX: Provide a fallback in case an older database entry has a null role
+            String role = user.getRole() != null ? user.getRole() : "USER";
+            
+            String token = jwtService.generateToken(user.getUsername(), role, user.getId());
             return ResponseEntity.ok(Map.of("token", token));
         }
         return ResponseEntity.status(401).body("Invalid credentials");
