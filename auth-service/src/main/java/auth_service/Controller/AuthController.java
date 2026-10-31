@@ -41,27 +41,35 @@ public class AuthController {
         return ResponseEntity.ok("User registered successfully");
     }
 
-    @PostMapping("/login")
+   @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+        System.out.println("Login attempt for user: " + request.get("username"));
         try {
             Optional<User> userOpt = userRepository.findByUsername(request.get("username"));
             
             if (userOpt.isPresent()) {
+                System.out.println("User found in DB.");
                 User user = userOpt.get();
+                
                 if (passwordEncoder.matches(request.get("password"), user.getPasswordHash())) {
+                    System.out.println("Password matched!");
                     String role = user.getRole() != null ? user.getRole() : "USER";
                     String token = jwtService.generateToken(user.getUsername(), role, user.getId());
+                    System.out.println("JWT generated successfully.");
                     return ResponseEntity.ok(Map.of("token", token));
+                } else {
+                    System.out.println("Password did NOT match!");
                 }
+            } else {
+                System.out.println("User NOT found in DB!");
             }
-            // Return JSON instead of a plain string to prevent frontend parsing errors
+            
             return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
             
         } catch (Exception e) {
-            // Force the exact crash trace into your Render logs
+            System.out.println("CRASH OCCURRED: " + e.getMessage());
             e.printStackTrace(); 
-            // Return the exact error message to the browser without breaking CORS
-            return ResponseEntity.status(500).body(Map.of("error", "Server crash: " + e.getMessage(), "cause", String.valueOf(e.getCause())));
+            return ResponseEntity.status(500).body(Map.of("error", "Server crash: " + e.getMessage()));
         }
     }
 }
