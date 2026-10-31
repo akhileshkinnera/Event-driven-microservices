@@ -23,7 +23,7 @@ spring:
           predicates:
             - Path=/api/auth/**
         - id: profile-service
-          uri: http://profile-service:8082 
+          uri: https://profile-service-9s5o.onrender.com 
           predicates:
             - Path=/api/profiles/**
           filters:
