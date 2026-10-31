@@ -43,17 +43,25 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        Optional<User> userOpt = userRepository.findByUsername(request.get("username"));
-        
-        if (userOpt.isPresent() && passwordEncoder.matches(request.get("password"), userOpt.get().getPasswordHash())) {
-            User user = userOpt.get();
+        try {
+            Optional<User> userOpt = userRepository.findByUsername(request.get("username"));
             
-            // FIX: Provide a fallback in case an older database entry has a null role
-            String role = user.getRole() != null ? user.getRole() : "USER";
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                if (passwordEncoder.matches(request.get("password"), user.getPasswordHash())) {
+                    String role = user.getRole() != null ? user.getRole() : "USER";
+                    String token = jwtService.generateToken(user.getUsername(), role, user.getId());
+                    return ResponseEntity.ok(Map.of("token", token));
+                }
+            }
+            // Return JSON instead of a plain string to prevent frontend parsing errors
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
             
-            String token = jwtService.generateToken(user.getUsername(), role, user.getId());
-            return ResponseEntity.ok(Map.of("token", token));
+        } catch (Exception e) {
+            // Force the exact crash trace into your Render logs
+            e.printStackTrace(); 
+            // Return the exact error message to the browser without breaking CORS
+            return ResponseEntity.status(500).body(Map.of("error", "Server crash: " + e.getMessage(), "cause", String.valueOf(e.getCause())));
         }
-        return ResponseEntity.status(401).body("Invalid credentials");
     }
 }
