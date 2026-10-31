@@ -8,16 +8,19 @@ spring:
       globalcors:
         corsConfigurations:
           '[/**]':
-            allowedOrigins: "http://localhost:5173"
+            allowedOrigins: 
+              - "http://localhost:5173"
+              - "https://event-driven-microservices.onrender.com"
             allowedMethods: "*"
             allowedHeaders: "*"
       routes:
         - id: auth-service
-          uri: http://auth-service:8081
+          uri: https://auth-service-1c5d.onrender.com
           predicates:
             - Path=/api/auth/**
         - id: profile-service
-          uri: http://profile-service:8082
+          # Note: You will need to update this URI once your profile-service is deployed to Render!
+          uri: http://profile-service:8082 
           predicates:
             - Path=/api/profiles/**
           filters:
