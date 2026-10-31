@@ -5,7 +5,10 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
       globalcors:
+        add-to-simple-url-handler-mapping: true
         corsConfigurations:
           '[/**]':
             allowedOrigins: 
@@ -13,13 +16,13 @@ spring:
               - "https://event-driven-microservices.onrender.com"
             allowedMethods: "*"
             allowedHeaders: "*"
+            allowCredentials: true
       routes:
         - id: auth-service
           uri: https://auth-service-1c5d.onrender.com
           predicates:
             - Path=/api/auth/**
         - id: profile-service
-          # Note: You will need to update this URI once your profile-service is deployed to Render!
           uri: http://profile-service:8082 
           predicates:
             - Path=/api/profiles/**

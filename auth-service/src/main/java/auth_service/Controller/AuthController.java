@@ -28,14 +28,14 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
         if (userRepository.findByUsername(request.get("username")).isPresent()) {
-            return ResponseEntity.badRequest().body("Username already exists");
+            return ResponseEntity.badRequest().body(Map.of("error", "Username already exists"));
         }
         User user = new User();
         user.setUsername(request.get("username"));
         user.setPasswordHash(passwordEncoder.encode(request.get("password")));
         user.setRole("USER"); 
         userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully");
+        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
     }
 
     @PostMapping("/login")
@@ -54,9 +54,7 @@ public class AuthController {
                     String token = jwtService.generateToken(user.getUsername(), role, user.getId());
                     System.out.println("JWT generated successfully.");
                     
-                    return ResponseEntity.ok()
-                            .header("Access-Control-Allow-Origin", "https://event-driven-microservices.onrender.com")
-                            .body(Map.of("token", token.trim()));
+                    return ResponseEntity.ok(Map.of("token", token.trim()));
                 } else {
                     System.out.println("Password did NOT match!");
                 }
