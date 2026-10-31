@@ -11,6 +11,7 @@ import auth_service.Service.JwtService;
 import java.util.Map;
 import java.util.Optional;
 
+@CrossOrigin(origins = {"http://localhost:5173", "[https://event-driven-microservices.onrender.com](https://event-driven-microservices.onrender.com)"})
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
