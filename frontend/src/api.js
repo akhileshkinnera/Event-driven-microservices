@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'https://api-gateway-j9ss.onrender.com',
+    baseURL: 'https://api-gateway-j9ss.onrender.com'
 });
 
 api.interceptors.request.use((config) => {

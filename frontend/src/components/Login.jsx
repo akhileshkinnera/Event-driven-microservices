@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from './api';
 
 const LoginPage = () => {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -11,24 +11,21 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage(''); // Clear previous messages
+    setMessage('');
 
-    // Determine the correct API Gateway endpoint based on the mode
     const endpoint = isRegisterMode
-      ? 'http://localhost:8080/api/auth/register'
-      : 'http://localhost:8080/api/auth/login';
+      ? '/api/auth/register'
+      : '/api/auth/login';
 
     try {
-      const response = await axios.post(endpoint, { username, password });
+      const response = await api.post(endpoint, { username, password });
 
       if (isRegisterMode) {
-        // Handle successful registration
         setMessage('Registration successful! Please log in.');
-        setIsRegisterMode(false); // Switch back to login view
+        setIsRegisterMode(false);
         setUsername('');
         setPassword('');
       } else {
-        // Handle successful login
         const token = response.data.token;
         localStorage.setItem('token', token);
         navigate('/dashboard');
