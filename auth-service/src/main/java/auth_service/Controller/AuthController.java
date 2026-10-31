@@ -33,15 +33,12 @@ public class AuthController {
         User user = new User();
         user.setUsername(request.get("username"));
         user.setPasswordHash(passwordEncoder.encode(request.get("password")));
-        
-        // FIX: Assign a default role so it is not null in the database
         user.setRole("USER"); 
-        
         userRepository.save(user);
         return ResponseEntity.ok("User registered successfully");
     }
 
-   @PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         System.out.println("Login attempt for user: " + request.get("username"));
         try {
@@ -56,7 +53,10 @@ public class AuthController {
                     String role = user.getRole() != null ? user.getRole() : "USER";
                     String token = jwtService.generateToken(user.getUsername(), role, user.getId());
                     System.out.println("JWT generated successfully.");
-                    return ResponseEntity.ok(Map.of("token", token));
+                    
+                    return ResponseEntity.ok()
+                            .header("Access-Control-Allow-Origin", "https://event-driven-microservices.onrender.com")
+                            .body(Map.of("token", token.trim()));
                 } else {
                     System.out.println("Password did NOT match!");
                 }
